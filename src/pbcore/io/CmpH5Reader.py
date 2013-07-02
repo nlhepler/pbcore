@@ -414,11 +414,18 @@ class CmpH5Alignment(object):
         return self.cmpH5.numPasses[self.rowNumber]
 
     @property
-    def barcode(self):
+    def barcodeId(self):
         """
-        (Barcoding only) The barcode for this alignment's read
+        (Barcoding only) The barcode ID (integer key) for this alignment's read
         """
-        return self.cmpH5.barcode[self.rowNumber]
+        return self.cmpH5.barcodeIds[self.rowNumber]
+
+    @property
+    def barcodeLabel(self):
+        """
+        (Barcoding only) The barcode label (string) for this alignment's read
+        """
+        return self.cmpH5.barcodeLabels[self.barcodeId]
 
     def alignmentArray(self, orientation="native"):
         """
@@ -790,10 +797,14 @@ class CmpH5Reader(object):
             self.numPasses = self.file["/AlnInfo/NumPasses"].value
 
         if "Barcode" in self.file["/AlnInfo"]:
-            barcodeIdToName = dict(zip(self.file["/BarcodeInfo/ID"],
-                                       self.file["/BarcodeInfo/Name"]))
-            self.barcode = map(barcodeIdToName.get,
-                               self.file["/AlnInfo/Barcode"].value[:,0])
+            # Build forward and backwards id<->label lookup tables
+            self.barcodeLabel = dict(zip(self.file["/BarcodeInfo/ID"],
+                                         self.file["/BarcodeInfo/Name"]))
+            self.barcodeId    = dict(zip(self.file["/BarcodeInfo/Name"],
+                                         self.file["/BarcodeInfo/ID"]))
+            # Barcode ID per row
+            self.barcodeIds = self.file["/AlnInfo/Barcode"].value[:,0]
+
 
 
     @property
