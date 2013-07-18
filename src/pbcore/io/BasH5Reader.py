@@ -165,12 +165,16 @@ class Zmw(object):
         Return the number of passes (forward + back) across the SMRTbell
         insert, used to forming the CCS consensus.
         """
+        if not self.hasConsensusBasecalls:
+            raise ValueError, "No CCS reads in this file"
         return self.baxH5._ccsNumPasses[self.index]
 
     #
     # The following calls return one or more ZmwRead objects.
     #
     def read(self, readStart=None, readEnd=None):
+        if not self.hasRawBasecalls:
+            raise ValueError, "No raw reads in this file"
         hqStart, hqEnd = self.hqRegion
         readStart = readStart or hqStart
         readEnd   = readEnd   or hqEnd
@@ -183,15 +187,21 @@ class Zmw(object):
 
     @property
     def subreads(self):
+        if not self.hasRawBasecalls:
+            raise ValueError, "No raw reads in this file"
         return [ self.read(readStart, readEnd)
                  for (readStart, readEnd) in self.insertRegions ]
 
     @property
     def adapters(self):
+        if not self.hasRawBasecalls:
+            raise ValueError, "No raw reads in this file"
         return [ self.read(readStart, readEnd)
                  for (readStart, readEnd) in self.adapterRegions ]
     @property
     def ccsRead(self):
+        if not self.hasConsensusBasecalls:
+            raise ValueError, "No CCS reads in this file"
         baseOffset  = self.baxH5._ccsOffsetsByHole[self.holeNumber]
         if (baseOffset[1] - baseOffset[0]) <= 0:
             return None
