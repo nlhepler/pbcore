@@ -60,7 +60,7 @@ class PlxZmw(Zmw):
     def pulsesByBaseInterval(self, beginBase, endBase):
         pulseIndex = self.readNoQC().PulseIndex()
         pulseStart = pulseIndex[beginBase]
-        pulseEnd   = pulseIndex[endBase - 1]
+        pulseEnd   = pulseIndex[endBase - 1] + 1
         return ZmwPulses(self.plxH5, self.holeNumber, pulseStart, pulseEnd)
 
     def pulsesByPulseInterval(self, beginPulse, endPulse):
